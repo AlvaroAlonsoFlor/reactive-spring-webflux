@@ -116,6 +116,37 @@ public class FluxAndMonoGeneratorService {
                 .log();
     }
 
+    public Flux<String> exploreConcat() {
+       var abcFlux = Flux.just("A", "B", "C");
+       var defFlux = Flux.just("D", "E", "F");
+
+       return Flux.concat(abcFlux, defFlux).log();
+    }
+
+    // same behaviour as above, you can concat two flux or two monos in a flux
+    public Flux<String> exploreConcatWith() {
+        var abcFlux = Mono.just("A");
+        var defFlux = Mono.just("B");
+
+        return abcFlux.concatWith(defFlux).log();
+    }
+
+    public Flux<String> exploreMerge() {
+        var abcFlux = Flux.just("A", "B", "C").delayElements(Duration.ofMillis(100));
+        var defFlux = Flux.just("D", "E", "F").delayElements(Duration.ofMillis(125));
+
+        return Flux.merge(abcFlux, defFlux).log(); // mergeWith is the same
+    }
+
+    public Flux<String> exploreZip() {
+        var abcFlux = Flux.just("A", "B", "C");
+        var defFlux = Flux.just("D", "E", "F");
+
+        // you can also map over the tuple
+        // Flux.zip(abcFlux, defFlux).map(t4 -> t4.getT1() + t4.getT2());
+        return Flux.zip(abcFlux, defFlux, (first, second) -> first + second).log(); // mergeWith is the same
+    }
+
     public Flux<String> splitStringDelay(String name) {
         var charArray = name.split("");
         int delay = new Random().nextInt(1000);
