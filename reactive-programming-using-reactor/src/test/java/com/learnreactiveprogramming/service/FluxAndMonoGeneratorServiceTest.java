@@ -58,6 +58,20 @@ class FluxAndMonoGeneratorServiceTest {
     }
 
     @Test
+    void namesFluxTransform_1() throws Exception {
+        var flux = fluxAndMonoGeneratorService.namesFluxTransform(6);
+
+        StepVerifier.create(flux).expectNext("default").expectNextCount(0).verifyComplete();
+    }
+
+    @Test
+    void namesFluxTransform_switchIfEmpty() throws Exception {
+        var flux = fluxAndMonoGeneratorService.namesFluxTransform_switchIfEmpty(6);
+
+        StepVerifier.create(flux).expectNext("D", "E", "F", "A", "U", "L", "T").expectNextCount(0).verifyComplete();
+    }
+
+    @Test
     void namesFluxFlatMapAsync () {
         var flux = fluxAndMonoGeneratorService.namesFluxFlatMapAsync(3);
 
