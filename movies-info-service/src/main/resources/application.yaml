@@ -1,0 +1,13 @@
+spring:
+  profiles:
+    active: local
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  data:
+    mongodb: # those defaults are created when no config is provided
+      host: localhost
+      port: 27017
+      database: local
