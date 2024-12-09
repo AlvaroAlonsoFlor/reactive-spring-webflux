@@ -29,7 +29,7 @@ class MoviesInfoControllerTest {
 
     @BeforeEach
     void setUp() {
-        var movieInfoList = List.of(new MovieInfo(null, "Batman Begins", 2005,
+        var movieInfoList = List.of(new MovieInfo("abc", "Batman Begins", 2005,
                         List.of("Cristian Bale", "Michael Cane"), LocalDate.parse("2005-06-15")),
                 new MovieInfo(null, "The Dark Knight", 2008,
                         List.of("Cristian Bale", "HeathLedger"), LocalDate.parse("2008-07-18")),
@@ -76,5 +76,21 @@ class MoviesInfoControllerTest {
                 .is2xxSuccessful()
                 .expectBodyList(MovieInfo.class)
                 .hasSize(3);
+    }
+
+    @Test
+    void getAllMovieInfoById() {
+
+        webTestClient
+                .get()
+                .uri("/v1/movies-info/abc")
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBodyList(MovieInfo.class)
+                .consumeWith(movieInfoEntityExchangeResult -> {
+                    var savedMovieInfo = movieInfoEntityExchangeResult.getResponseBody();
+                    assert savedMovieInfo != null;
+                });
     }
 }

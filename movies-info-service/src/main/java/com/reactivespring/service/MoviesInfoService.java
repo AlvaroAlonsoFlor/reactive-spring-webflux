@@ -22,4 +22,8 @@ public class MoviesInfoService {
     public Flux<MovieInfo> getAllMoviesInfo() {
         return movieInfoRepository.findAll();
     }
+
+    public Mono<MovieInfo> getMovieInfoById(String id) {
+        return movieInfoRepository.findById(id);
+    }
 }
