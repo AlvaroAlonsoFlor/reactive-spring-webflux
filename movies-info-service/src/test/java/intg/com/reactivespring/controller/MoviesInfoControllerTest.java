@@ -111,4 +111,15 @@ class MoviesInfoControllerTest {
                 .jsonPath("$.name")
                 .isEqualTo("Batman Begins1");
     }
+
+    @Test
+    void deleteMovieInfo() {
+
+        webTestClient
+                .delete()
+                .uri("/v1/movies-info/abc")
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+    }
 }
