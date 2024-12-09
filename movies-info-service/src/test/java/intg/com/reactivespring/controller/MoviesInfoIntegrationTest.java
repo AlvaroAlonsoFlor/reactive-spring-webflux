@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @AutoConfigureWebTestClient
-class MoviesInfoControllerTest {
+class MoviesInfoIntegrationTest {
 
     @Autowired
     MovieInfoRepository movieInfoRepository;
