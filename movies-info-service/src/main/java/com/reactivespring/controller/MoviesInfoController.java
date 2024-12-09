@@ -33,4 +33,9 @@ public class MoviesInfoController {
     public Mono<MovieInfo> addMovieInfo(@RequestBody MovieInfo movieInfo) {
         return moviesInfoService.addMovieInfo(movieInfo);
     }
+
+    @PutMapping("/movies-info/{id}")
+    public Mono<MovieInfo> updateMovieInfo(@RequestBody MovieInfo movieInfo, @PathVariable String id) {
+        return moviesInfoService.updateMovieInfo(movieInfo, id);
+    }
 }

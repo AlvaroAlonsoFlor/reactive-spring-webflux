@@ -93,4 +93,22 @@ class MoviesInfoControllerTest {
                     assert savedMovieInfo != null;
                 });
     }
+
+    @Test
+    void updateMovieInfo() {
+
+        var movieInfo = new MovieInfo("abc", "Batman Begins1", 2005,
+                List.of("Cristian Bale", "Michael Cane"), LocalDate.parse("2005-06-15"));
+
+        webTestClient
+                .put()
+                .uri("/v1/movies-info/abc")
+                .bodyValue(movieInfo)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.name")
+                .isEqualTo("Batman Begins1");
+    }
 }
