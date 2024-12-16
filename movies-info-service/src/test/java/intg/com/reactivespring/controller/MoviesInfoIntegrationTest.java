@@ -113,6 +113,21 @@ class MoviesInfoIntegrationTest {
     }
 
     @Test
+    void updateMovieInfoNotFound() {
+
+        var movie = new MovieInfo("adf", "Batman Begins1", 2005,
+                List.of("Cristian Bale", "Michael Cane"), LocalDate.parse("2005-06-15"));
+
+        webTestClient
+                .put()
+                .uri("/v1/movies-info/adf")
+                .bodyValue(movie)
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+    }
+
+    @Test
     void deleteMovieInfo() {
 
         webTestClient
