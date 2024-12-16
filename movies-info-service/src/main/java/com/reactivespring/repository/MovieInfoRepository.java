@@ -10,4 +10,6 @@ import javax.validation.constraints.Positive;
 public interface MovieInfoRepository extends ReactiveMongoRepository<MovieInfo, String> {
 
     Flux<MovieInfo> findByYear(@NotNull @Positive(message = "movieInfo.year must be a Positive value") Integer year);
+
+    Flux<MovieInfo> findByName(@NotNull String name);
 }

@@ -54,4 +54,12 @@ class MovieInfoRepositoryIntgTest {
         StepVerifier.create(moviesInfoFlux).expectNextCount(1).verifyComplete();
     }
 
+    @Test
+    void findByName() {
+
+        var moviesInfoFlux = movieInfoRepository.findByName("Batman Begins");
+
+        StepVerifier.create(moviesInfoFlux).expectNextCount(1).verifyComplete();
+    }
+
 }
