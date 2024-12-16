@@ -101,7 +101,7 @@ public class MoviesInfoControllerTest {
     @Test
     void addMoviesInfoFailedValidation() {
         var movie = new MovieInfo(null, null, -2005,
-                List.of("Cristian Bale", "Michael Cane"), LocalDate.parse("2005-06-15"));
+                List.of("", "Michael Cane"), LocalDate.parse("2005-06-15"));
 
         when(serviceMock.addMovieInfo(movie)).thenReturn(Mono.just(movie));
 
@@ -115,7 +115,7 @@ public class MoviesInfoControllerTest {
                 .expectBody(String.class)
                 .consumeWith(result -> {
             var responseBody = result.getResponseBody();
-            var expectedMessage = "movieInfo.name must be present,movieInfo.year must be a Positive value";
+            var expectedMessage = "movieInfo.cast must be present,movieInfo.name must be present,movieInfo.year must be a Positive value";
             assertEquals(expectedMessage, responseBody);
         });
     }
