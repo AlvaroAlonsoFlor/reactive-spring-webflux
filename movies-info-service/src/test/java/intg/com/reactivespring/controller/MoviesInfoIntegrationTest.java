@@ -95,6 +95,17 @@ class MoviesInfoIntegrationTest {
     }
 
     @Test
+    void getAllMovieInfoByIdNotFound() {
+
+        webTestClient
+                .get()
+                .uri("/v1/movies-info/def")
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+    }
+
+    @Test
     void updateMovieInfo() {
 
         var movieInfo = new MovieInfo("abc", "Batman Begins1", 2005,
