@@ -10,7 +10,9 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -20,6 +22,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("test")
 @AutoConfigureWebTestClient
 class MoviesInfoIntegrationTest {
+
+    private final URI MOVIES_INFO_URL = URI.create("/v1/movies-info");
 
     @Autowired
     MovieInfoRepository movieInfoRepository;
@@ -76,6 +80,24 @@ class MoviesInfoIntegrationTest {
                 .is2xxSuccessful()
                 .expectBodyList(MovieInfo.class)
                 .hasSize(3);
+    }
+
+    @Test
+    void getAllMoviesInfoByYear() {
+
+        var url = UriComponentsBuilder.fromUri(MOVIES_INFO_URL)
+                .queryParam("year", 2005)
+                .buildAndExpand()
+                .toUri();
+
+        webTestClient
+                .get()
+                .uri(url)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBodyList(MovieInfo.class)
+                .hasSize(1);
     }
 
     @Test
