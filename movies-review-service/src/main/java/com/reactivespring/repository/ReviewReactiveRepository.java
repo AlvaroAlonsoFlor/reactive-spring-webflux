@@ -3,5 +3,5 @@ package com.reactivespring.repository;
 import com.reactivespring.domain.Review;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 
-public class ReviewReactiveRepository extends ReactiveMongoRepository<Review, String> {
+public interface ReviewReactiveRepository extends ReactiveMongoRepository<Review, String> {
 }

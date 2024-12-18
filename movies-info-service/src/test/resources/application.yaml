@@ -1,0 +1,10 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost/test
+      database: test
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: '5.0.5'
