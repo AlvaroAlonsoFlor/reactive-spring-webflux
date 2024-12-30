@@ -22,8 +22,8 @@ public class ReviewsRestClient {
         this.webClient = webClient;
     }
 
-    public Flux<Review> retrieveReviews(String movieId) throws URISyntaxException {
-        var url = UriComponentsBuilder.fromUri(new URI(reviewUrl))
+    public Flux<Review> retrieveReviews(String movieId) {
+        var url = UriComponentsBuilder.fromUriString(reviewUrl)
                 .queryParam("movieId", movieId)
                 .buildAndExpand().toUriString();
 
