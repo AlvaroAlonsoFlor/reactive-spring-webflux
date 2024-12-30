@@ -31,7 +31,7 @@ dependencies {
 
 	//test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation group: 'de.flapdoodle.embed', name: 'de.flapdoodle.embed.mongo', version: '4.18.1'
+	testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo.spring3x:4.18.0'
 	testImplementation 'io.projectreactor:reactor-test'
 }
 
