@@ -1,57 +1,44 @@
 package com.reactivespring.routes;
 
 import com.reactivespring.domain.Review;
+import com.reactivespring.handler.ReviewHandler;
 import com.reactivespring.repository.ReviewReactiveRepository;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import com.reactivespring.router.ReviewRouter;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataMongo;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
-
-import java.util.List;
-import java.util.Objects;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-@AutoConfigureDataMongo
+@WebFluxTest
+@ContextConfiguration(classes = { ReviewRouter.class, ReviewHandler.class })
 @AutoConfigureWebTestClient
-public class ReviewsIntegrationTest {
+public class ReviewRouterTest {
+
+    @MockitoBean
+    private ReviewReactiveRepository repository;
 
     @Autowired
-    WebTestClient webTestClient;
-
-    @Autowired
-    ReviewReactiveRepository repository;
+    private WebTestClient webTestClient;
 
     static final String REVIEWS_URL = "/v1/reviews";
 
-    @BeforeEach
-    void setUp() {
-        var reviewsList = List.of(
-                new Review(null, 1L, "Awesome Movie", 9.0),
-                new Review(null, 1L, "Awesome Movie1", 9.0),
-                new Review("test-id", 2L, "Excellent Movie", 8.0)
-        );
-
-        repository.saveAll(reviewsList).blockLast();
-    }
-
-    @AfterEach
-    void tearDown() {
-        repository.deleteAll().block();
-    }
-
     @Test
     void addReview() {
+
         var review = new Review(null, 1L, "Awesome Movie", 9.0);
+
+        when(repository.save(isA(Review.class))).thenReturn(Mono.just(new Review("abc", 1L, "Awesome Movie", 9.0)));
 
         webTestClient
                 .post()
@@ -71,6 +58,8 @@ public class ReviewsIntegrationTest {
     @Test
     void getAllReviews() {
 
+        when(repository.findAll()).thenReturn(Flux.just(new Review("abc", 1L, "Awesome Movie", 9.0)));
+
         webTestClient
                 .get()
                 .uri(REVIEWS_URL)
@@ -78,11 +67,13 @@ public class ReviewsIntegrationTest {
                 .expectStatus()
                 .isOk()
                 .expectBodyList(Review.class)
-                .hasSize(3);
+                .hasSize(1);
     }
 
     @Test
     void getAllReviewsByMovieInfoId() {
+
+        when(repository.findReviewsByMovieInfoId(1L)).thenReturn(Flux.just(new Review("abc", 1L, "Awesome Movie", 9.0)));
 
         webTestClient
                 .get()
@@ -91,16 +82,19 @@ public class ReviewsIntegrationTest {
                 .expectStatus()
                 .isOk()
                 .expectBodyList(Review.class)
-                .hasSize(2);
+                .hasSize(1);
     }
 
     @Test
     void updateReview() {
-        var review = new Review("test-id", 2L, "Average Movie", 5.0);
+        var review = new Review("abc", 2L, "Average Movie", 5.0);
+
+        when(repository.findById("abc")).thenReturn(Mono.just(review));
+        when(repository.save(isA(Review.class))).thenReturn(Mono.just(review));
 
         webTestClient
                 .put()
-                .uri(REVIEWS_URL + "/test-id")
+                .uri(REVIEWS_URL + "/abc")
                 .bodyValue(review)
                 .exchange()
                 .expectStatus()
@@ -116,14 +110,14 @@ public class ReviewsIntegrationTest {
     @Test
     void deleteReview() {
 
+        when(repository.findById("abc")).thenReturn(Mono.just(new Review("abc", 1L, "Awesome Movie", 9.0)));
+        when(repository.delete(isA(Review.class))).thenReturn(Mono.empty());
+
         webTestClient
                 .delete()
-                .uri(REVIEWS_URL + "/test-id")
+                .uri(REVIEWS_URL + "/abc")
                 .exchange()
                 .expectStatus()
                 .isNoContent();
     }
-
-
-
 }
