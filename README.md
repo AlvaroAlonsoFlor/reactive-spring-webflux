@@ -1,6 +1,14 @@
 # reactive-spring-webflux
-Spring Webflux
 
-#### Run mongodb
+Fork for the Spring Webflux course
 
-Run `docker compose up`. This is required to run the application locally.
+## Run configurations
+
+Run `docker compose up` to start up Mongo
+
+### Run applications
+
+If you want to run the applications as containers run `docker compose --profile apps up`. 
+They have ports for debugging from your IDE
+
+
