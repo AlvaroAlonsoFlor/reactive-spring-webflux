@@ -4,6 +4,10 @@ services:
       - "apps"
     build:
       context: ./movies-service
+    develop:
+      watch:
+        - action: rebuild
+          path: ./movies-service
     environment:
       JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=*:5005,server=y,suspend=n"
     ports:
