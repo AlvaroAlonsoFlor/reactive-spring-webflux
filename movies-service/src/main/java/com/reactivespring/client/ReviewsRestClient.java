@@ -7,16 +7,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 @Component
 public class ReviewsRestClient {
 
     @Value("${restClient.reviewsUrl}")
     private String reviewUrl;
 
-    private WebClient webClient;
+    private final WebClient webClient;
 
     public ReviewsRestClient(WebClient webClient) {
         this.webClient = webClient;

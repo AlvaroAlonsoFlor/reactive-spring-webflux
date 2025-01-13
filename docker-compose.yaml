@@ -2,6 +2,7 @@ services:
   movies-service:
     profiles:
       - "apps"
+    image: reactive-spring-webflux/movies-service
     build:
       context: ./movies-service
     develop:
