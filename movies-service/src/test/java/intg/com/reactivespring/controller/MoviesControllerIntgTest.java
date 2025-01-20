@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -52,6 +53,55 @@ public class MoviesControllerIntgTest {
                 .consumeWith(response -> {
                     var movie = response.getResponseBody();
                     assert Objects.requireNonNull(movie).getReviewList().size() == 2;
+                    assertEquals("Batman Begins", movie.getMovieInfo().getName());
+                });
+    }
+
+    @Test
+    public void retrieveMoviesByIdNotFoundMoviesInfo() {
+
+        var id = "abc";
+
+        stubFor(get(urlEqualTo(String.format("/v1/movies-info/%s", id)))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.NOT_FOUND.value())));
+
+        stubFor(get(urlPathEqualTo("/v1/reviews"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBodyFile("reviews.json")));
+
+        webClient
+                .get()
+                .uri("/v1/movies/{id}", id)
+                .exchange()
+                .expectStatus()
+                .is4xxClientError();
+    }
+
+    @Test
+    public void retrieveMoviesByIdNotFoundReview() {
+
+        var id = "abc";
+
+        stubFor(get(urlEqualTo(String.format("/v1/movies-info/%s", id)))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBodyFile("movies-info.json")));
+
+        stubFor(get(urlPathEqualTo("/v1/reviews"))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.NOT_FOUND.value())));
+
+        webClient
+                .get()
+                .uri("/v1/movies/{id}", id)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Movie.class)
+                .consumeWith(response -> {
+                    var movie = response.getResponseBody();
+                    assert Objects.requireNonNull(movie).getReviewList().isEmpty();
                     assertEquals("Batman Begins", movie.getMovieInfo().getName());
                 });
     }
