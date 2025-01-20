@@ -24,11 +24,17 @@ public class ReviewsRestClient {
 
     private final WebClient webClient;
 
+    @Value("${restClient.retryPolicy.delaySeconds}")
+    private int delaySeconds;
+
+    @Value("${restClient.retryPolicy.maxAttempts}")
+    private long maxAttempts;
+
     private final Retry retryPolicy;
 
     public ReviewsRestClient(WebClient webClient) {
         this.webClient = webClient;
-        this.retryPolicy = new RetryPolicy().create();
+        this.retryPolicy = RetryPolicy.create(maxAttempts, delaySeconds);;
     }
 
     public Flux<Review> retrieveReviews(String movieId) {
@@ -56,6 +62,6 @@ public class ReviewsRestClient {
                                     "Server Exception in ReviewsService " + responseMessage)));
                 })
                 .bodyToFlux(Review.class)
-                .retryWhen(retryPolicy);
+                .retryWhen(this.retryPolicy);
     }
 }

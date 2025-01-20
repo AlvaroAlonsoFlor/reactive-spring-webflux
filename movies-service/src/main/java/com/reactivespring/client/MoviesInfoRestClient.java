@@ -17,15 +17,21 @@ import reactor.util.retry.Retry;
 @Slf4j
 public class MoviesInfoRestClient {
 
-    private WebClient webClient;
+    private final WebClient webClient;
     private final Retry retryPolicy;
 
     @Value("${restClient.moviesInfoUrl}")
     private String moviesInfoUrl;
 
+    @Value("${restClient.retryPolicy.delaySeconds}")
+    private int delaySeconds;
+
+    @Value("${restClient.retryPolicy.maxAttempts}")
+    private long maxAttempts;
+
     public MoviesInfoRestClient(WebClient webClient) {
         this.webClient = webClient;
-        this.retryPolicy = new RetryPolicy().create();
+        this.retryPolicy = RetryPolicy.create(maxAttempts, delaySeconds);
     }
 
     public Mono<MovieInfo> retrieveMovieInfo(String movieId) {

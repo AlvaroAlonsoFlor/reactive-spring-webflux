@@ -2,6 +2,7 @@ package com.reactivespring.controller;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.reactivespring.domain.Movie;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -30,6 +31,11 @@ public class MoviesControllerIntgTest {
 
     @Autowired
     WebTestClient webClient;
+
+    @AfterEach
+    public void cleanUp() {
+        resetAllRequests();
+    }
 
     @Test
     public void retrieveMoviesById() {
@@ -131,6 +137,6 @@ public class MoviesControllerIntgTest {
                 .expectBody(String.class)
                 .isEqualTo("Internal Server Error");
 
-        verify(1, getRequestedFor(urlPathEqualTo(path)));
+        WireMock.verify(1, getRequestedFor(urlPathEqualTo(path)));
     }
 }
