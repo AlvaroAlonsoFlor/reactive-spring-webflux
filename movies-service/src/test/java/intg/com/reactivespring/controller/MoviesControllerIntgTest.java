@@ -1,5 +1,6 @@
 package com.reactivespring.controller;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.reactivespring.domain.Movie;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @AutoConfigureWireMock(port = 8084)
 @TestPropertySource(properties = {
         "restClient.moviesInfoUrl=http://localhost:8084/v1/movies-info",
-        "restClient.reviewsUrl=http://localhost:8084/v1/reviews"
+        "restClient.reviewsUrl=http://localhost:8084/v1/reviews",
+        "restClient.retryPolicy.maxAttempts=1"
 })
 public class MoviesControllerIntgTest {
 
@@ -110,8 +112,9 @@ public class MoviesControllerIntgTest {
     public void retrieveMoviesById5XXMovieInfo() {
 
         var id = "abc";
+        var path = String.format("/v1/movies-info/%s", id);
 
-        stubFor(get(urlEqualTo(String.format("/v1/movies-info/%s", id)))
+        stubFor(get(urlEqualTo(path))
                 .willReturn(aResponse()
                         .withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
                         .withBody("Movie Info Service Unavailable")));
@@ -127,5 +130,7 @@ public class MoviesControllerIntgTest {
                 .expectStatus().is5xxServerError()
                 .expectBody(String.class)
                 .isEqualTo("Internal Server Error");
+
+        verify(1, getRequestedFor(urlPathEqualTo(path)));
     }
 }

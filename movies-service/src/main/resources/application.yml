@@ -4,5 +4,8 @@ spring:
 restClient:
   moviesInfoUrl: http://localhost:8080/v1/movies-info
   reviewsUrl: http://localhost:8081/v1/reviews
+  retryPolicy:
+    maxAttempts: 3
+    delaySeconds: 1
 server:
   port: 8082
