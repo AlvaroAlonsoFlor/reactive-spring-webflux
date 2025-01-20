@@ -105,4 +105,27 @@ public class MoviesControllerIntgTest {
                     assertEquals("Batman Begins", movie.getMovieInfo().getName());
                 });
     }
+
+    @Test
+    public void retrieveMoviesById5XXMovieInfo() {
+
+        var id = "abc";
+
+        stubFor(get(urlEqualTo(String.format("/v1/movies-info/%s", id)))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                        .withBody("Movie Info Service Unavailable")));
+
+        stubFor(get(urlPathEqualTo("/v1/reviews"))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.NOT_FOUND.value())));
+
+        webClient
+                .get()
+                .uri("/v1/movies/{id}", id)
+                .exchange()
+                .expectStatus().is5xxServerError()
+                .expectBody(String.class)
+                .isEqualTo("Internal Server Error");
+    }
 }
