@@ -1,6 +1,5 @@
 package com.reactivespring.handler;
 
-import com.mongodb.internal.connection.Server;
 import com.reactivespring.domain.Review;
 import com.reactivespring.exception.ReviewDataException;
 import com.reactivespring.exception.ReviewNotFoundException;
@@ -10,17 +9,20 @@ import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
 
 import java.util.stream.Collectors;
 
 @Component
 @Slf4j
 public class ReviewHandler {
+
+    Sinks.Many<Review> reviewsSink = Sinks.many().replay().latest();
 
     @Autowired
     private Validator validator;
@@ -35,6 +37,7 @@ public class ReviewHandler {
         return request.bodyToMono(Review.class)
                 .doOnNext(this::validate)
                 .flatMap(reviewReactiveRepository::save)
+                .doOnNext(review -> reviewsSink.tryEmitNext(review))
                 .flatMap(ServerResponse.status(HttpStatus.CREATED)::bodyValue);
     }
 
@@ -83,5 +86,13 @@ public class ReviewHandler {
 
         return existingReview.flatMap(reviewReactiveRepository::delete)
                 .then(ServerResponse.noContent().build());
+    }
+
+    public Mono<ServerResponse> getReviewsStream(ServerRequest request) {
+        return ServerResponse
+                .ok()
+                .contentType(MediaType.APPLICATION_NDJSON)
+                .body(reviewsSink.asFlux(), Review.class)
+                .log();
     }
 }
