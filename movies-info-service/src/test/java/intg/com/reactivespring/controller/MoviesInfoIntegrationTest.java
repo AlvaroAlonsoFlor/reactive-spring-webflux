@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.test.StepVerifier;
 
 import java.net.URI;
 import java.time.LocalDate;
@@ -171,5 +172,44 @@ class MoviesInfoIntegrationTest {
                 .exchange()
                 .expectStatus()
                 .isNoContent();
+    }
+
+    @Test
+    void getMoviesInfoStream() {
+
+        var movieInfo = new MovieInfo(null, "Batman Begins1", 2005,
+                List.of("Cristian Bale", "Michael Cane"), LocalDate.parse("2005-06-15"));
+
+        webTestClient
+                .post()
+                .uri("/v1/movies-info")
+                .bodyValue(movieInfo)
+                .exchange()
+                .expectStatus()
+                .isCreated()
+                .expectBody(MovieInfo.class)
+                .consumeWith(movieInfoEntityExchangeResult -> {
+                    var savedMovieInfo = movieInfoEntityExchangeResult.getResponseBody();
+                    assert savedMovieInfo != null;
+                    assertNotNull(savedMovieInfo.getMovieInfoId());
+                });
+
+        var moviesStream = webTestClient
+                .get()
+                .uri("/v1/movies-info/stream")
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .returnResult(MovieInfo.class)
+                .getResponseBody();
+
+
+
+        StepVerifier.create(moviesStream)
+                .assertNext(movieInfoResult -> {
+                    assertNotNull(movieInfoResult.getMovieInfoId());
+                })
+                .thenCancel()
+                .verify();
     }
 }
